@@ -18,7 +18,7 @@ function App() {
   const [ChoiceTwo,setChoiceTwo]=useState(null)
   const [flipped, setFlipped] = useState([])
   const [disabled,setDisabled]=useState(false)
-
+  const [gameCompleted, setGameCompleted] = useState(false);
 
   // Shuffle and initialize cards
   const shuffleCards = () => {
@@ -28,6 +28,7 @@ function App() {
 
     setCards(shuffledCards)
     setTurns(0)
+    setGameCompleted(false)
 
     // setFlipped([]);
   };
@@ -55,15 +56,28 @@ useEffect(() => {
     if(ChoiceOne.src === ChoiceTwo.src)
     {
       setCards(prevCards => {
-        return prevCards.map(card => {
-          if(card.src === ChoiceOne.src){
-            return {...card, matched:true};
+        const updatedCards = prevCards.map((card)=>{
+          if(card.src == ChoiceOne.src){
+            return {...card , matched: true};
           }else{
-            return card
-            
+            return card;
           }
         })
-      })
+        const allMatched = updatedCards.every((card)=>card.matched);
+if(allMatched){
+  setGameCompleted(true);
+
+}return updatedCards;
+        // return prevCards.map(card => {
+        //   if(card.src === ChoiceOne.src){
+        //     return {...card, matched:true};
+        //   }else{
+        //     return card
+            
+        //   }
+        // })
+        
+      });
       resetTurn()
     }else {
       setTimeout(() => resetTurn(), 1000)
@@ -72,6 +86,9 @@ useEffect(() => {
 }, [ChoiceOne,ChoiceTwo])
 
 console.log(cards)
+
+
+
 
 // rest choices
 const resetTurn = () => {
@@ -86,6 +103,13 @@ const resetTurn = () => {
   return (
     <div className="App">
       <h1>Magic Match</h1>
+      {gameCompleted ? (
+        <div>
+          <p style={{ textAlign: 'centre', fontWeight: 'bold', fontSize: '30px',color:'red' }}>Congratulations!
+             </p>
+        </div>
+      ):(
+      <div>
       <button onClick={shuffleCards}>New Game</button>
 
       <div className="card-grid">
@@ -94,9 +118,11 @@ const resetTurn = () => {
           flipped={card === ChoiceOne || card === ChoiceTwo || card.matched}
           disabled={disabled}/>
         ))}
-      </div>
+        </div>
       <p>Turns : {turns}</p>
       </div>
+      )}
+      </div>   
   );
 }
 
